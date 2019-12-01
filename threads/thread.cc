@@ -100,6 +100,7 @@ Thread::Fork(VoidFunctionPtr func, _int arg)
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
     scheduler->ReadyToRun(this);	// ReadyToRun assumes that interrupts 
 					// are disabled!
+    currentThread->Yield();             // 判断优先级，决定执行哪个线程
     (void) interrupt->SetLevel(oldLevel);
 }    
 
@@ -188,8 +189,17 @@ Thread::Yield ()
     
     nextThread = scheduler->FindNextToRun();
     if (nextThread != NULL) {
-	scheduler->ReadyToRun(this);
-	scheduler->Run(nextThread);
+      // 如果下一个线程的优先级高，就把当前线程放入就绪队列，运行下一个线程
+      if (nextThread->getPriority() < currentThread->getPriority())
+	{
+	  scheduler->ReadyToRun(this);
+	  scheduler->Run(nextThread);
+	}
+      // 否则，就把下一个线程放入就绪队列，继续运行当前线程。
+      else
+	{
+	  scheduler->ReadyToRun(nextThread);
+	}
     }
     (void) interrupt->SetLevel(oldLevel);
 }

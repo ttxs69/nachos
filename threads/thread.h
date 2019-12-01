@@ -99,6 +99,8 @@ class Thread {
     
     void CheckOverflow();   			// Check if thread has 
 						// overflowed its stack
+    int getPriority() { return priority; }
+    void setPriority(int prior) { priority = prior; }
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
     void Print() { printf("%s, ", name); }
@@ -111,6 +113,8 @@ class Thread {
 					// (If NULL, don't deallocate stack)
     ThreadStatus status;		// ready, running or blocked
     char* name;
+
+    int priority;                       // 线程的优先级
 
     void StackAllocate(VoidFunctionPtr func, _int arg);
     					// Allocate a stack for thread.
