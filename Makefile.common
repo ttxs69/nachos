@@ -54,7 +54,7 @@ vpath %.s   ../network:../filesys:../vm:../userprog:../threads:../machine
 #CFLAGS = -g -Wall -Wshadow -fwritable-strings $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
 # to comment -fwritable-strings out to make new compiler happy 
 # -ptang, 8/22/05
-CFLAGS = -g -Wall -Wshadow $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
+CFLAGS = -g -Wall -Wshadow -no-pie $(INCPATH) $(DEFINES) $(HOST) -DCHANGED
 
 # The variables {C,S,CC}FILES should be initialized by the Makefile
 # that invokes this makefile.  The ofiles variable is used in building
