@@ -133,6 +133,7 @@ Lock::~Lock()
 void Lock::Acquire() 
 {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);  // disable interrupts
+    DEBUG('t',"Lock Acquire\n");
 
     lock->P();                            // procure the semaphore
     owner = currentThread;                // record the new owner of the lock
@@ -147,6 +148,7 @@ void Lock::Acquire()
 void Lock::Release() 
 {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);  // disable interrupts
+    DEBUG('t',"Lock Release");
 
     // Ensure: a) lock is BUSY  b) this thread is the same one that acquired it.
     ASSERT(currentThread == owner);        
@@ -206,6 +208,7 @@ Condition::~Condition()
 void Condition::Wait(Lock* conditionLock) 
 { 
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    DEBUG('t',"Condition Wait\n");
 
     ASSERT(conditionLock->isHeldByCurrentThread());  // check pre-condition
     if(queue->IsEmpty()) {

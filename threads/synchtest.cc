@@ -131,15 +131,108 @@ SynchThread(_int which)
     }
 }
 
+class Buffer {
+private:
+  int numObjects = 5;
+  int currentNum;
+  Condition *bufferFull;
+  Lock *lock;
+public:
+  Buffer();
+  ~Buffer();
+  void Produce(); // product an item
+  void Consume(); // consume an item
+};
+
+Buffer::Buffer()
+{
+  currentNum = 0;
+  bufferFull = new Condition("buffer");
+  lock = new Lock("buffer");
+}
+
+Buffer::~Buffer()
+{
+  delete bufferFull;
+  delete lock;
+}
+
+void
+Buffer::Produce()
+{
+  DEBUG('t',"Ready to producing item,index: [%d]\n",currentNum);
+  lock->Acquire();
+  while(currentNum>=numObjects)
+    bufferFull->Wait(lock);
+  currentNum++;
+  bufferFull->Broadcast(lock);
+  lock->Release();
+  DEBUG('t',"Produce item finished,index: [%d]\n",currentNum-1);
+}
+
+void
+Buffer::Consume()
+{
+  DEBUG('t',"Ready to consume item,index: [%d]\n",currentNum-1);
+  lock->Acquire();
+  while(currentNum<=0)
+    bufferFull->Wait(lock);
+  currentNum--;
+  bufferFull->Broadcast(lock);
+  lock->Release();
+  DEBUG('t',"Consume item finished,index: [%d]\n",currentNum+1);
+}
+
+Buffer *buffer = new Buffer();
+//---------------------------------------------------------------------
+// SynchProducer
+//---------------------------------------------------------------------
+void
+SynchProducer(int which)
+{
+  for (int i=0;i<8;i++)
+    {
+      buffer->Produce();
+      printf("Producer [%d] producing item [%d]...\n",which,i);
+      currentThread->Yield();
+    }
+}
+
+//---------------------------------------------------------------------
+// SynchConsumer
+//---------------------------------------------------------------------
+void
+SynchConsumer(int which)
+{
+  for (int i=0;i<8;i++)
+    {
+      buffer->Consume();
+      printf("Consumer [%d] consuming item [%d]...\n",which,i);
+      currentThread->Yield();
+    }
+}
+
 void
 SynchTest()
 {
-    const int maxCars = 7;  // How much traffic?
-    int i = 0;
-    Thread *ts[maxCars];
+  //const int maxCars = 7;  // How much traffic?
+  //int i = 0;
+  //Thread *ts[maxCars];
 
-    for(i=0; i < maxCars; i++) {
-	ts[i] = new Thread("forked thread");
-	ts[i]->Fork(SynchThread, i);
-    }
+  //for(i=0; i < maxCars; i++) {
+  //	ts[i] = new Thread("forked thread");
+  //	ts[i]->Fork(SynchThread, i);
+  //}
+  const int maxProducer = 3; // The number of producer
+  const int maxConsumer = 3; // The number of consumer
+  Thread *producer[maxProducer];
+  Thread *consumer[maxConsumer];
+  for(int i=0;i<maxProducer;i++) {
+    producer[i] = new Thread("forked thread producer");
+    producer[i]->Fork(SynchProducer,i);
+  }
+  for(int i=0;i<maxConsumer;i++) {
+    consumer[i] = new Thread("forked thread consumer");
+    consumer[i]->Fork(SynchConsumer,i);
+  }
 }
