@@ -114,7 +114,7 @@ class Thread {
     ThreadStatus status;		// ready, running or blocked
     char* name;
 
-    int priority;                       // 线程的优先级
+    int priority = 3;                       // 线程的优先级,默认设置为3.
 
     void StackAllocate(VoidFunctionPtr func, _int arg);
     					// Allocate a stack for thread.
