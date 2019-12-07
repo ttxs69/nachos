@@ -99,12 +99,28 @@ int
 Ring::Empty()
 {
 // to be implemented
+  for (int i=0;i<size;i++)
+    {
+      if(buffer[i].thread_id!=0||buffer[i].value!=0)
+        {
+          return 0;
+        }
+    }
+  return 1;
 }
 
 int
 Ring::Full()
 {
 // to be implemented
+  for (int i=0;i<size;i++)
+    {
+      if(buffer[i].thread_id==0&&buffer[i].value==0)
+        {
+          return 0;
+        }
+    }
+  return 1;
 }
 
 
