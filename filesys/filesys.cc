@@ -201,7 +201,7 @@ FileSystem::Create(char *name, int initialSize)
             	success = FALSE;	// no space on disk for data
 	    else {	
 	    	success = TRUE;
-		// everthing worked, flush all changes back to disk
+		// evertOBhing worked, flush all changes back to disk
     	    	hdr->WriteBack(sector); 		
     	    	directory->WriteBack(directoryFile);
     	    	freeMap->WriteBack(freeMapFile);
