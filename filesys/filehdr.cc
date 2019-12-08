@@ -40,7 +40,7 @@
 
 bool
 FileHeader::Allocate(BitMap *freeMap, int fileSize)
-{ 
+{
     numBytes = fileSize;
     numSectors  = divRoundUp(fileSize, SectorSize);
     if (freeMap->NumClear() < numSectors)
@@ -49,6 +49,28 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize)
     for (int i = 0; i < numSectors; i++)
 	dataSectors[i] = freeMap->Find();
     return TRUE;
+}
+
+//---------------------------------------------------------------------
+// FileHeader::Extend
+//
+//--------------------------------------------------------------------
+bool
+FileHeader::Extend(BitMap *freeMap, int fileSize)
+{
+  int newNumBytes = fileSize;
+  int newNumSectors = divRoundUp(fileSize, SectorSize);
+  if (newNumSectors > MaxFileSize)
+    return FALSE;              // file is too big
+
+  if (freeMap->NumClear() < newNumSectors)
+    return FALSE;              // not enough sapce
+
+  for (int i = numSectors; i< newNumSectors;i++)
+    dataSectors[i] = freeMap->Find();
+  numBytes = newNumBytes;
+  numSectors = newNumSectors;
+  return TRUE;
 }
 
 //----------------------------------------------------------------------

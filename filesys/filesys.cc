@@ -214,6 +214,21 @@ FileSystem::Create(char *name, int initialSize)
     return success;
 }
 
+bool
+FileSystem::Extend(FileHeader *hdr,int fileSize)
+{
+  BitMap *freeMap = new BitMap(NumSectors);
+  freeMap->FetchFrom(freeMapFile);
+  if (!hdr->Extend(freeMap,fileSize))
+    {
+      delete freeMap;
+      return 0;
+    }
+  freeMap->WriteBack(freeMapFile);
+  delete freeMap;
+  return 1;
+}
+
 //----------------------------------------------------------------------
 // FileSystem::Open
 // 	Open a file for reading and writing.  

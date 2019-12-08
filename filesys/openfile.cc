@@ -25,10 +25,11 @@
 //----------------------------------------------------------------------
 
 OpenFile::OpenFile(int sector)
-{ 
+{
     hdr = new FileHeader;
     hdr->FetchFrom(sector);
     seekPosition = 0;
+    FileHeaderSector = sector;
 }
 
 //----------------------------------------------------------------------
@@ -53,7 +54,7 @@ void
 OpenFile::Seek(int position)
 {
     seekPosition = position;
-}	
+}
 
 //----------------------------------------------------------------------
 // OpenFile::Read/Write
@@ -119,8 +120,8 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
 
     if ((numBytes <= 0) || (position >= fileLength))
     	return 0; 				// check request
-    if ((position + numBytes) > fileLength)		
-	numBytes = fileLength - position;
+    if ((position + numBytes) > fileLength)
+        numBytes = fileLength - position;
     DEBUG('f', "Reading %d bytes at %d, from file of length %d.\n", 	
 			numBytes, position, fileLength);
 
@@ -148,10 +149,14 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     bool firstAligned, lastAligned;
     char *buf;
 
-    if ((numBytes <= 0) || (position >= fileLength))
+    if ((numBytes <= 0) || (position > fileLength))
 	return 0;				// check request
     if ((position + numBytes) > fileLength)
-	numBytes = fileLength - position;
+      // numBytes = fileLength - position;
+      {
+        if (!fileSystem->Extend(hdr,position+numBytes))
+          return 0;
+      }
     DEBUG('f', "Writing %d bytes at %d, from file of length %d.\n", 	
 			numBytes, position, fileLength);
 
@@ -180,6 +185,17 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
 					&buf[(i - firstSector) * SectorSize]);
     delete [] buf;
     return numBytes;
+}
+
+
+//---------------------------------------------------------------------
+//OpenFile::WriteBack
+//    Write the changed fileheader to the disk.
+//---------------------------------------------------------------------
+void
+OpenFile::WriteBack()
+{
+    hdr->WriteBack(FileHeaderSector);
 }
 
 //----------------------------------------------------------------------

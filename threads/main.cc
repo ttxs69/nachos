@@ -89,7 +89,7 @@ main(int argc, char **argv)
     
 #ifdef THREADS
     //ThreadTest();
-#if 1
+#if 0
     SynchTest();
 #endif 
 #endif

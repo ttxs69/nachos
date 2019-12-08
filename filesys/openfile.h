@@ -81,12 +81,16 @@ class OpenFile {
 					// bypassing the implicit position.
     int WriteAt(char *from, int numBytes, int position);
 
+    void WriteBack();                  // Write the change of fileheader back
+                                       // to the disk.
+
     int Length(); 			// Return the number of bytes in the
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 
 					// end of file, tell, lseek back 
     
   private:
+    int FileHeaderSector;               // FileHeader Sector on disk
     FileHeader *hdr;			// Header for this file 
     int seekPosition;			// Current position within the file
 };

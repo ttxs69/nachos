@@ -56,6 +56,10 @@ class FileHeader {
 
     void Print();			// Print the contents of the file.
 
+    bool Extend(BitMap *bitmap, int fileSize);// Extened the file header,
+                                              // including allocating space
+                                              // on disk for the file data
+
   private:
     int numBytes;			// Number of bytes in the file
     int numSectors;			// Number of data sectors in the file

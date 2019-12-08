@@ -76,6 +76,8 @@ class FileSystem {
 
     bool Create(char *name, int initialSize);  	
 					// Create a file (UNIX creat)
+    bool Extend(FileHeader *hdr, int fileSize);
+                                        // Extend the file size.
 
     OpenFile* Open(char *name); 	// Open a file (UNIX open)
 
