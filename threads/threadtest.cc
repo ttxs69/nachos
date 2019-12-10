@@ -45,8 +45,8 @@ ThreadTest()
 
     currentThread->setPriority(4);
 
-    Thread *t = new Thread("forked thread");
-    Thread *t1 = new Thread("forked thread 02");
+    Thread *t = new Thread("forked thread",nextPid++);
+    Thread *t1 = new Thread("forked thread 02",nextPid++);
     
     t->setPriority(5);
     t1->setPriority(3);

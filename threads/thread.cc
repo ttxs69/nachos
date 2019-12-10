@@ -32,8 +32,9 @@
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
-Thread::Thread(char* threadName)
+Thread::Thread(char* threadName, int pid)
 {
+  threadId = pid;
     name = threadName;
     stackTop = NULL;
     stack = NULL;

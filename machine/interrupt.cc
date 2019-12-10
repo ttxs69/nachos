@@ -245,7 +245,7 @@ Interrupt::Halt()
     Cleanup();     // Never returns.
 }
 
-//----------------------------------------------------------------------
+
 // Interrupt::Schedule
 // 	Arrange for the CPU to be interrupted when simulated time
 //	reaches "now + when".

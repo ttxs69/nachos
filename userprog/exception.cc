@@ -25,6 +25,12 @@
 #include "system.h"
 #include "syscall.h"
 
+
+// deal with the user program's thread
+static void ThreadFuncForUserProg(int arg);
+
+static void SysCallHaltHandler();
+static void SysCallExecHandler();
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -53,11 +59,72 @@ ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2);
 
-    if ((which == SyscallException) && (type == SC_Halt)) {
-	DEBUG('a', "Shutdown, initiated by user program.\n");
-   	interrupt->Halt();
-    } else {
-	printf("Unexpected user mode exception %d %d\n", which, type);
+
+    switch(which)
+      {
+      case SyscallException:
+        switch(type)
+          {
+          case SC_Halt:
+            SysCallHaltHandler();
+            break;
+          case SC_Exec:
+            SysCallExecHandler();
+            break;
+          default:
+            break;
+          }
+        break;
+      default:
+        printf("Unexpected user mode exception %d %d\n", which, type);
 	ASSERT(FALSE);
+      }
+}
+
+
+static void ThreadFuncForUserProg(int arg)
+{
+  currentThread->RestoreUserState();
+  //TODO modify 3 registers
+  if(arg && currentThread->space!=NULL)
+    {
+      currentThread->space->InitRegisters();
+      currentThread->space->RestoreState();
     }
+
+  machine->Run();
+}
+
+static void SysCallHaltHandler()
+{
+  DEBUG('a',"ShutDown, initiated by user program.\n");
+  interrupt->Halt();
+}
+
+static void SysCallExecHandler()
+{
+  char filename[100];
+  int arg = machine->ReadRegister(4);
+  int i=0;
+  do
+    {
+      machine->ReadMem(arg+i,1,(int *)&filename[i]);
+    }
+  while (filename[i++]!='\0');
+
+  OpenFile *executable = fileSystem->Open(filename);
+  if (executable!=NULL)
+    {
+      Thread *thread = new Thread(filename,nextPid++);
+      thread->space = new AddrSpace(thread->getThreadId(),executable);
+      machine->WriteRegister(2,thread->getThreadId());
+
+      DEBUG('a',"Exec from thread %d -> executable %s\n",currentThread->getThreadId(),filename);
+      thread->Fork(ThreadFuncForUserProg,1);
+    }
+  else
+    {
+      machine->WriteRegister(2,-1);
+    }
+  machine->AdvancePC();
 }

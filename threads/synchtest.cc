@@ -228,11 +228,11 @@ SynchTest()
   Thread *producer[maxProducer];
   Thread *consumer[maxConsumer];
   for(int i=0;i<maxProducer;i++) {
-    producer[i] = new Thread("forked thread producer");
+    producer[i] = new Thread("forked thread producer",nextPid++);
     producer[i]->Fork(SynchProducer,i);
   }
   for(int i=0;i<maxConsumer;i++) {
-    consumer[i] = new Thread("forked thread consumer");
+    consumer[i] = new Thread("forked thread consumer",nextPid++);
     consumer[i]->Fork(SynchConsumer,i);
   }
 }

@@ -82,7 +82,7 @@ class Thread {
     _int machineState[MachineStateSize];  // all registers except for stackTop
 
   public:
-    Thread(char* debugName);		// initialize a Thread 
+    Thread(char* debugName,int pid);		// initialize a Thread 
     ~Thread(); 				// deallocate a Thread
 					// NOTE -- thread being deleted
 					// must not be running when delete 
@@ -103,11 +103,13 @@ class Thread {
     void setPriority(int prior) { priority = prior; }
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
+    int setThreadId(int pid) {threadId = pid;} // set the thread id
+    int getThreadId() {return threadId;}       // get the thread id
     void Print() { printf("%s, ", name); }
 
   private:
     // some of the private data for this class is listed above
-    
+    int threadId;                       // thread id
     int* stack; 	 		// Bottom of the stack 
 					// NULL if this is the main thread
 					// (If NULL, don't deallocate stack)

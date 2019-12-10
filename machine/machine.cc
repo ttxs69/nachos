@@ -212,3 +212,11 @@ void Machine::WriteRegister(int num, int value)
 	registers[num] = value;
     }
 
+//------------------------------------------------------------------------
+// Machine::AdvancePc
+//------------------------------------------------------------------------
+void
+Machine::AdvancePC() {
+  machine->WriteRegister(PCReg, machine->ReadRegister(PCReg) + 4);
+  machine->WriteRegister(NextPCReg, machine->ReadRegister(NextPCReg) + 4);
+}

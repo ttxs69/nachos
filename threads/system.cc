@@ -7,6 +7,7 @@
 
 #include "copyright.h"
 #include "system.h"
+#include "bitmap.h"
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
@@ -29,6 +30,8 @@ SynchDisk   *synchDisk;
 
 #ifdef USER_PROGRAM	// requires either FILESYS or FILESYS_STUB
 Machine *machine;	// user program memory and registers
+BitMap *bitmap;         // user program memory bitmap
+int nextPid = 0;
 #endif
 
 #ifdef NETWORK
@@ -146,7 +149,7 @@ Initialize(int argc, char **argv)
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
-    currentThread = new Thread("main");		
+    currentThread = new Thread("main",nextPid++);
     currentThread->setStatus(RUNNING);
 
     interrupt->Enable();
@@ -154,6 +157,7 @@ Initialize(int argc, char **argv)
     
 #ifdef USER_PROGRAM
     machine = new Machine(debugUserProg);	// this must come first
+    bitmap = new BitMap(NumPhysPages);
 #endif
 
 #ifdef FILESYS
