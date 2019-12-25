@@ -117,6 +117,7 @@ static void SysCallExecHandler()
     {
       Thread *thread = new Thread(filename,nextPid++);
       thread->space = new AddrSpace(thread->getThreadId(),executable);
+      thread->space->Print();
       machine->WriteRegister(2,thread->getThreadId());
 
       DEBUG('a',"Exec from thread %d -> executable %s\n",currentThread->getThreadId(),filename);
